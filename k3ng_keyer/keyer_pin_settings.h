@@ -2,15 +2,15 @@
 #ifndef keyer_pin_settings_h
 #define keyer_pin_settings_h
 
-#define paddle_left 2
-#define paddle_right 5
-#define tx_key_line_1 11       // (high = key down/tx on)
-#define tx_key_line_2 12
+#define paddle_left 5
+#define paddle_right 6
+#define tx_key_line_1 0       // (high = key down/tx on)
+#define tx_key_line_2 0
 #define tx_key_line_3 0
 #define tx_key_line_4 0
 #define tx_key_line_5 0
 #define tx_key_line_6 0
-#define sidetone_line 4         // connect a speaker for sidetone
+#define sidetone_line 11         // connect a speaker for sidetone
 #define potentiometer A0        // Speed potentiometer (0 to 5 V) Use pot from 1k to 10k
 #define ptt_tx_1 0              // PTT ("push to talk") lines
 #define ptt_tx_2 0              //   Can be used for keying fox transmitter, T/R switch, or keying slow boatanchors
@@ -21,10 +21,11 @@
 #define tx_key_dit 0            // if defined, goes active for dit (any transmitter) - customized with tx_key_dit_and_dah_pins_active_state and tx_key_dit_and_dah_pins_inactive_state
 #define tx_key_dah 0            // if defined, goes active for dah (any transmitter) - customized with tx_key_dit_and_dah_pins_active_state and tx_key_dit_and_dah_pins_inactive_state
 
-#ifdef FEATURE_COMMAND_BUTTONS
-  #define analog_buttons_pin A1
-  #define command_mode_active_led 0
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
+  #define analog_buttons_pin A0
+  #define command_mode_active_led 13
 #endif //FEATURE_COMMAND_BUTTONS
+
 
 /*
 FEATURE_SIDETONE_SWITCH
@@ -57,6 +58,27 @@ FEATURE_SIDETONE_SWITCH
   #define lcd_d7 7
 #endif //FEATURE_LCD1602_N07DH
 
+#ifdef FEATURE_LCD_TINKERKIT
+  #define lcd_rs A4     //8
+  #define lcd_enable 7  //9
+  #define lcd_d4 A3     //4
+  #define lcd_d5 4      //5
+  #define lcd_d6 12     //6
+  #define lcd_d7 8      //7
+  #define lcd_rw A5
+  #define BACKLIGHT 10
+  #define CONTRASTPIN 9 // B7
+#endif //FEATURE_LCD_TINKERKIT
+
+/*  From Tinkerkit example
+#define D4  A3
+#define D5  4
+#define D6  12
+#define D7  8
+#define RS  A4
+#define RW  A5
+#define EN 7
+*/
 //ps2 keyboard pins
 #ifdef FEATURE_PS2_KEYBOARD
   #define ps2_keyboard_data A3
