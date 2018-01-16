@@ -67,7 +67,7 @@ FEATURE_SIDETONE_SWITCH
   #define lcd_rw A5
   #define BACKLIGHT 10
   #define CONTRASTPIN 9
-+#endif //FEATURE_LCD_TINKERKIT
+#endif //FEATURE_LCD_TINKERKIT
 
 //ps2 keyboard pins
 #ifdef FEATURE_PS2_KEYBOARD
