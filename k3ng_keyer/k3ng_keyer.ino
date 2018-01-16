@@ -824,6 +824,8 @@ Recent Update History
   #include "keyer_features_and_options_fk_10.h"  
 #elif defined(HARDWARE_TEST)
   #include "keyer_features_and_options_test.h"
+#elif defined(HARDWARE_TINKERKIT_LCD)
+  #include "keyer_features_and_options_tinkerkit_lcd.h"
 #else
   #include "keyer_features_and_options.h"
 #endif
@@ -856,6 +858,9 @@ Recent Update History
 #elif defined(HARDWARE_TEST)
   #include "keyer_pin_settings_test.h"
   #include "keyer_settings_test.h"
+#elif defined(HARDWARE_TINKERKIT_LCD)
+  #include "keyer_pin_settings_tinkerkit_lcd.h"
+  #include "keyer_settings.h"
 #else
   #include "keyer_pin_settings.h"
   #include "keyer_settings.h"
@@ -869,7 +874,7 @@ Recent Update History
   #include <K3NG_PS2Keyboard.h>
 #endif
 
-#if defined(FEATURE_LCD_4BIT) || defined(FEATURE_LCD1602_N07DH)
+#if defined(FEATURE_LCD_4BIT) || defined(FEATURE_LCD1602_N07DH) || defined(FEATURE_LCD_TINKERKIT)
   #include <LiquidCrystal.h>
   #include <Wire.h>
 #endif
@@ -1222,6 +1227,12 @@ byte send_buffer_status = SERIAL_SEND_BUFFER_NORMAL;
 #if defined(FEATURE_LCD_4BIT) || defined(FEATURE_LCD1602_N07DH)
   LiquidCrystal lcd(lcd_rs, lcd_enable, lcd_d4, lcd_d5, lcd_d6, lcd_d7);
 #endif
+
+#if defined(FEATURE_LCD_TINKERKIT)
+  LiquidCrystal lcd(lcd_rs, lcd_rw, lcd_enable, lcd_d4, lcd_d5, lcd_d6, lcd_d7);
+#endif
+
+
 
 #if defined(FEATURE_LCD_ADAFRUIT_I2C)
   Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
@@ -14828,7 +14839,7 @@ void initialize_serial_ports(){
       primary_serial_port_baud_rate = WINKEY_DEFAULT_BAUD;
     #endif //defined(FEATURE_WINKEY_EMULATION) && !defined(FEATURE_COMMAND_LINE_INTERFACE)
     
-    primary_serial_port = PRIMARY_SERIAL_PORT;
+    primary_serial_port = &PRIMARY_SERIAL_PORT;
 
     primary_serial_port->begin(primary_serial_port_baud_rate);
     
@@ -14956,6 +14967,14 @@ void initialize_display(){
       lcd.setBacklight(HIGH);
     #endif
 
+#ifdef FEATURE_LCD_TINKERKIT
+      pinMode(BACKLIGHT, OUTPUT);
+      pinMode(CONTRASTPIN, OUTPUT);
+      
+      //  TODO:  Add contrast and backlight control to analog pins/terminal/command modes
+      analogWrite(BACKLIGHT, 255);
+      analogWrite(CONTRASTPIN, 50);
+ #endif //FEATURE_LCD_TINKERKIT
 
     #ifdef OPTION_DISPLAY_NON_ENGLISH_EXTENSIONS  // OZ1JHM provided code, cleaned up by LA3ZA
       // Store bit maps, designed using editor at http://omerk.github.io/lcdchargen/
