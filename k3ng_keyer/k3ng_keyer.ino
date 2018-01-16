@@ -869,7 +869,7 @@ Recent Update History
   #include <K3NG_PS2Keyboard.h>
 #endif
 
-#if defined(FEATURE_LCD_4BIT) || defined(FEATURE_LCD1602_N07DH)
+#if defined(FEATURE_LCD_4BIT) || defined(FEATURE_LCD1602_N07DH) || defined(FEATURE_LCD_TINKERKIT)
   #include <LiquidCrystal.h>
   #include <Wire.h>
 #endif
@@ -986,7 +986,7 @@ byte config_dirty = 0;
 unsigned long ptt_time = 0; 
 byte ptt_line_activated = 0;
 byte speed_mode = SPEED_NORMAL;
-#if defined(FEATURE_COMMAND_LINE_INTERFACE) || defined(FEATURE_PS2_KEYBOARD) || defined(FEATURE_MEMORY_MACROS) || defined(FEATURE_MEMORIES) || defined(FEATURE_COMMAND_BUTTONS)
+#if defined(FEATURE_COMMAND_LINE_INTERFACE) || defined(FEATURE_PS2_KEYBOARD) || defined(FEATURE_MEMORY_MACROS) || defined(FEATURE_MEMORIES) || defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
   unsigned int serial_number = 1;
 #endif
 byte pause_sending_buffer = 0;
@@ -1222,6 +1222,12 @@ byte send_buffer_status = SERIAL_SEND_BUFFER_NORMAL;
 #if defined(FEATURE_LCD_4BIT) || defined(FEATURE_LCD1602_N07DH)
   LiquidCrystal lcd(lcd_rs, lcd_enable, lcd_d4, lcd_d5, lcd_d6, lcd_d7);
 #endif
+
+#if defined(FEATURE_LCD_TINKERKIT)
+  LiquidCrystal lcd(lcd_rs, lcd_rw, lcd_enable, lcd_d4, lcd_d5, lcd_d6, lcd_d7);
+#endif
+
+
 
 #if defined(FEATURE_LCD_ADAFRUIT_I2C)
   Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
@@ -1472,6 +1478,8 @@ void setup()
   initialize_web_server();
   initialize_debug_startup();
 
+
+
 }
 
 // --------------------------------------------------------------------------------------------
@@ -1505,7 +1513,7 @@ void loop()
   #endif //defined(FEATURE_BEACON) && defined(FEATURE_MEMORIES)
 
   if (keyer_machine_mode == KEYER_NORMAL) {
-    #ifdef FEATURE_COMMAND_BUTTONS
+    #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
       check_command_buttons();
     #endif //FEATURE_COMMAND_BUTTONS
     check_paddles();
@@ -5591,7 +5599,7 @@ long get_cw_input_from_user(unsigned int exit_time_milliseconds) {
 
 //-------------------------------------------------------------------------------------------------------
 
-#ifdef FEATURE_COMMAND_BUTTONS
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void command_mode()
 {
 
@@ -6336,7 +6344,7 @@ void command_progressive_5_char_echo_practice(){
 #endif //defined(FEATURE_COMMAND_MODE_PROGRESSIVE_5_CHAR_ECHO_PRACTICE) && defined(FEATURE_COMMAND_BUTTONS)
 //-------------------------------------------------------------------------------------------------------
 
-#if defined(FEATURE_COMMAND_BUTTONS)
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void command_set_serial_number() {
   
   byte character_count = 0;;
@@ -6419,7 +6427,7 @@ void adjust_dah_to_dit_ratio(int adjustment) {
 
 //-------------------------------------------------------------------------------------------------------
 
-#ifdef FEATURE_COMMAND_BUTTONS
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void command_dah_to_dit_ratio_adjust() {
 
   byte looping = 1;
@@ -6455,7 +6463,7 @@ void command_dah_to_dit_ratio_adjust() {
 
 //-------------------------------------------------------------------------------------------------------
 
-#ifdef FEATURE_COMMAND_BUTTONS
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void command_weighting_adjust() {
 
   byte looping = 1;
@@ -6492,7 +6500,7 @@ void command_weighting_adjust() {
 
 //-------------------------------------------------------------------------------------------------------
 
-#ifdef FEATURE_COMMAND_BUTTONS
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void command_tuning_mode() {
 
   byte looping = 1;
@@ -6573,7 +6581,7 @@ void sidetone_adj(int hz) {
 }
 
 //-------------------------------------------------------------------------------------------------------
-#if defined(FEATURE_COMMAND_BUTTONS) && !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
+#if (defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)) && !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
 void command_sidetone_freq_adj() {
 
   byte looping = 1;
@@ -6617,7 +6625,7 @@ void command_sidetone_freq_adj() {
 }
 #endif //FEATURE_COMMAND_BUTTONS
 //-------------------------------------------------------------------------------------------------------
-#ifdef FEATURE_COMMAND_BUTTONS
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void command_speed_mode()
 {
 
@@ -6817,6 +6825,18 @@ void initialize_analog_button_array() {
 
 //------------------------------------------------------------------
 
+#ifdef FEATURE_1_COMMAND_BUTTON
+byte analogbuttonpressed(){
+  if(digitalRead(analog_buttons_pin) == LOW) return 0;
+  else return 255;
+}
+
+byte analogbuttonread(byte button_number){
+  if( digitalRead(analog_buttons_pin) == HIGH) return 0;
+  else return 1;
+}
+#endif
+
 #ifdef FEATURE_COMMAND_BUTTONS
 byte analogbuttonpressed() {
 
@@ -6976,7 +6996,7 @@ byte analogbuttonread(byte button_number) {
 
 //------------------------------------------------------------------
 
-#ifdef FEATURE_COMMAND_BUTTONS
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
 void check_command_buttons()
 {
 
@@ -11154,7 +11174,7 @@ void serial_tune_command (PRIMARY_SERIAL_CLS * port_to_use)
   sending_mode = MANUAL_SENDING;
   tx_and_sidetone_key(1);
   port_to_use->println("\r\nKeying tx - press a key to unkey");
-  #ifdef FEATURE_COMMAND_BUTTONS
+  #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
     while ((port_to_use->available() == 0) && (!analogbuttonread(0))) {}  // keystroke or button0 hit gets us out of here
   #else
     while (port_to_use->available() == 0) {}
@@ -11811,7 +11831,7 @@ void receive_transmit_echo_practice(PRIMARY_SERIAL_CLS * port_to_use,byte practi
           loop1 = 0;
           loop2 = 0;
         }
-        #ifdef FEATURE_COMMAND_BUTTONS
+        #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
           while (analogbuttonread(0)) {
             user_send_loop = 0;
             loop1 = 0;
@@ -12120,7 +12140,7 @@ void random_practice(PRIMARY_SERIAL_CLS * port_to_use,byte random_mode,byte grou
       loop1 = 0;
     }
 
-    #ifdef FEATURE_COMMAND_BUTTONS
+    #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
       while ((paddle_pin_read(paddle_left) == LOW) || (paddle_pin_read(paddle_right) == LOW) || (analogbuttonread(0))) {
         loop1 = 0;
       }
@@ -12485,7 +12505,7 @@ void serial_practice_interactive(PRIMARY_SERIAL_CLS * port_to_use,byte practice_
       }
   
       delay(100);
-      #ifdef FEATURE_COMMAND_BUTTONS
+      #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
       while ((paddle_pin_read(paddle_left) == LOW) || (paddle_pin_read(paddle_right) == LOW) || (analogbuttonread(0))) {
         loop1 = 0;
         loop2 = 0;
@@ -12601,7 +12621,7 @@ void serial_practice_non_interactive(PRIMARY_SERIAL_CLS * port_to_use,byte pract
         x = 99;
       }
 
-      #ifdef FEATURE_COMMAND_BUTTONS
+      #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
         while ((paddle_pin_read(paddle_left) == LOW) || (paddle_pin_read(paddle_right) == LOW) || (analogbuttonread(0))) {
           loop1 = 0;
           loop2 = 0;
@@ -13249,14 +13269,14 @@ byte memory_nonblocking_delay(unsigned long delaytime)
 
   while ((millis() - starttime) < delaytime) {
     check_paddles();
-    #ifdef FEATURE_COMMAND_BUTTONS
+    #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
     if (((dit_buffer) || (dah_buffer) || (analogbuttonread(0))) && (keyer_machine_mode != BEACON)) {   // exit if the paddle or button0 was hit
     #else
     if (((dit_buffer) || (dah_buffer)) && (keyer_machine_mode != BEACON)) {   // exit if the paddle or button0 was hit
     #endif
       dit_buffer = 0;
       dah_buffer = 0;
-      #ifdef FEATURE_COMMAND_BUTTONS
+      #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
       while (analogbuttonread(0)) {}
       #endif
       return 1;
@@ -13270,7 +13290,7 @@ byte memory_nonblocking_delay(unsigned long delaytime)
 //---------------------------------------------------------------------
 void check_button0()
 {
-  #ifdef FEATURE_COMMAND_BUTTONS
+  #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
     if (analogbuttonread(0)) {button0_buffer = 1;}
   #endif
 }
@@ -13850,7 +13870,7 @@ byte play_memory(byte memory_number)
               dah_buffer = 0;
               button0_buffer = 0;
               repeat_memory = 255;
-              #ifdef FEATURE_COMMAND_BUTTONS
+              #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
                 while (analogbuttonread(0)) {}
               #endif  
               return 0;
@@ -13861,7 +13881,7 @@ byte play_memory(byte memory_number)
               dah_buffer = 0;
               button0_buffer = 0;
               repeat_memory = 255;
-              #ifdef FEATURE_COMMAND_BUTTONS
+              #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
                 while (analogbuttonread(0)) {}
               #endif  
               return 0;
@@ -14057,7 +14077,7 @@ void program_memory(int memory_number)
          }       
        #endif //FEATURE_MEMORY_MACROS
 
-       #ifdef FEATURE_COMMAND_BUTTONS
+       #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
          while (analogbuttonread(0)) {    // hit the button to get out of command mode if no paddle was hit
            loop1 = 0;
            loop2 = 0;
@@ -14256,7 +14276,15 @@ void initialize_pins() {
     }
   #endif //FEATURE_COMMAND_BUTTONS && command_mode_active_led
   
-  
+     #ifdef FEATURE_1_COMMAND_BUTTON
+      pinMode(analog_buttons_pin,INPUT);
+      #endif
+    #if defined(FEATURE_1_COMMAND_BUTTON) && defined(command_mode_active_led)
+    if(command_mode_active_led) {
+      pinMode (command_mode_active_led, OUTPUT);
+      digitalWrite (command_mode_active_led,LOW);
+    }
+  #endif //FEATURE_COMMAND_BUTTONS && command_mode_active_led
   #ifdef FEATURE_LED_RING
     pinMode(led_ring_sdi,OUTPUT);
     pinMode(led_ring_clk,OUTPUT);
@@ -14788,7 +14816,7 @@ void initialize_serial_ports(){
   
     #if defined(FEATURE_WINKEY_EMULATION) && defined(FEATURE_COMMAND_LINE_INTERFACE) //--------------------------------------------
     
-      #ifdef FEATURE_COMMAND_BUTTONS
+      #if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
         if (analogbuttonread(0)) {
           #ifdef OPTION_PRIMARY_SERIAL_PORT_DEFAULT_WINKEY_EMULATION
             primary_serial_port_mode = SERIAL_CLI;
@@ -14828,7 +14856,7 @@ void initialize_serial_ports(){
       primary_serial_port_baud_rate = WINKEY_DEFAULT_BAUD;
     #endif //defined(FEATURE_WINKEY_EMULATION) && !defined(FEATURE_COMMAND_LINE_INTERFACE)
     
-    primary_serial_port = PRIMARY_SERIAL_PORT;
+    primary_serial_port = &Serial ;// PRIMARY_SERIAL_PORT;
 
     primary_serial_port->begin(primary_serial_port_baud_rate);
     
@@ -14955,6 +14983,15 @@ void initialize_display(){
     #ifdef FEATURE_LCD_ADAFRUIT_BACKPACK
       lcd.setBacklight(HIGH);
     #endif
+
+    #ifdef FEATURE_LCD_TINKERKIT
+      pinMode(BACKLIGHT, OUTPUT);
+      pinMode(CONTRASTPIN, OUTPUT);
+      
+      //  TODO:  Add contrast and backlight control to analog pins/terminal/command modes
+      analogWrite(BACKLIGHT, 255);
+      analogWrite(CONTRASTPIN, 50);
+    #endif //FEATURE_LCD_TINKERKIT
 
 
     #ifdef OPTION_DISPLAY_NON_ENGLISH_EXTENSIONS  // OZ1JHM provided code, cleaned up by LA3ZA

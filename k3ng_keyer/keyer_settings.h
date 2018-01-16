@@ -61,11 +61,12 @@
 #define default_wordsworth_repetition 1
 #define serial_program_memory_buffer_size 500
 
-#ifdef FEATURE_COMMAND_BUTTONS
-  #define analog_buttons_number_of_buttons 4
-  #define analog_buttons_r1 10
+#if defined(FEATURE_COMMAND_BUTTONS) || defined(FEATURE_1_COMMAND_BUTTON)
+  #define analog_buttons_number_of_buttons 1
+  #define analog_buttons_r1 32
   #define analog_buttons_r2 1
 #endif
+
 
 
 #if defined(FEATURE_COMMAND_BUTTONS) &&  !defined(FEATURE_PS2_KEYBOARD) && !defined(FEATURE_USB_KEYBOARD) && !defined(FEATURE_COMMAND_LINE_INTERFACE) && !defined(FEATURE_WINKEY_EMULATION)
