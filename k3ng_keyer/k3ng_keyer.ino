@@ -14839,7 +14839,7 @@ void initialize_serial_ports(){
       primary_serial_port_baud_rate = WINKEY_DEFAULT_BAUD;
     #endif //defined(FEATURE_WINKEY_EMULATION) && !defined(FEATURE_COMMAND_LINE_INTERFACE)
     
-    primary_serial_port = &PRIMARY_SERIAL_PORT;
+    primary_serial_port = PRIMARY_SERIAL_PORT;
 
     primary_serial_port->begin(primary_serial_port_baud_rate);
     
