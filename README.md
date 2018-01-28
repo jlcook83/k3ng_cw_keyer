@@ -5,3 +5,6 @@ The K3NG Keyer is an open source Arduino based CW (Morse Code) keyer with a lot 
 
 Documentation is located here:
 https://github.com/k3ng/k3ng_cw_keyer/wiki
+
+
+jlcook83: Port to work with the Tinkerkit LCD - an all-in-one 2x16 LCD with 32u4 processor.  This makes for a nice compact keyer.
